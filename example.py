@@ -27,7 +27,7 @@ print(qr.data)
 '''
 
 # data = qreader.read('qr-2.png')
-# data = qreader.read('qr_n.gif')
-data = qreader.read('qr_e.gif')
+data = qreader.read('qr_n.gif')
+# data = qreader.read('qr_e.gif')
 print(data)
 

@@ -82,7 +82,7 @@ class ImageScanner(Scanner):
     def read_info(self):
         print('ImageScanner.read_info: {}'.format(self._was_read))
         info = QRCodeInfo()
-        info.canvas = self.get_image_borders()
+        info.canvas = self.get_image_borders()                      # borders of QR code
         info.block_size = self.get_block_size(info.canvas[:2])      # Number of pixels per module
         info.size = int((info.canvas[2] - (info.canvas[0]) + 1) / info.block_size[0]) # Number of modules on horizontal line
         info.version = (info.size - 17) // 4    # QR code version
@@ -121,8 +121,8 @@ class ImageScanner(Scanner):
 
         max_dist = min(self.image.width, self.image.height)
         min_x, min_y = get_corner_pixel((0, 0), (1, 1), max_dist)                           # Top-left
-        max_x, max_x_y = get_corner_pixel((self.image.width - 1, 0), (-1, 1), max_dist)
-        max_y_x, max_y = get_corner_pixel((0, self.image.height - 1), (1, -1), max_dist)
+        max_x, max_x_y = get_corner_pixel((self.image.width - 1, 0), (-1, 1), max_dist)     # Top-right
+        max_y_x, max_y = get_corner_pixel((0, self.image.height - 1), (1, -1), max_dist)    # Bottom-left
         if max_x_y != min_y:
             raise QrImageRecognitionException('Top-left position pattern not aligned with the top-right one')
         if max_y_x != min_x:
@@ -131,23 +131,23 @@ class ImageScanner(Scanner):
 
     def get_block_size(self, img_start):
         """
-        Returns the size in pixels of a single block.
+        Returns the size in pixels of a single block/module.
         :param tuple[int, int] img_start: The topmost left pixel in the QR (MUST be black or dark).
         :return: A tuple of width, height in pixels of a block
         :rtype: tuple[int, int]
         """
         # print('ImageScanner.get_block_size: {}'.format(self._was_read))
-        pattern_size = 7
+        pattern_size = 1
 
         left, top = img_start
         block_height, block_width = None, None
         for i in range(1, (self.image.width - left) // pattern_size):
             if self._get_pixel((left + i * pattern_size, top)) == WHITE:
-                block_width = i
+                block_width = i // 7
                 break
         for i in range(1, (self.image.height - top) // pattern_size):
             if self._get_pixel((left, top + i * pattern_size)) == WHITE:
-                block_height = i
+                block_height = i // 7
                 break
         return block_width, block_height
 
@@ -159,6 +159,9 @@ class ImageScanner(Scanner):
         # Read both locations
         source_1 = (self._get_straight_bits((8, -7), 7, 'd') << 8) + self._get_straight_bits((-1, 8), 8, 'l')
         source_2 = (self._get_straight_bits((7, 8), 8, 'l', (1,)) << 8) + self._get_straight_bits((8, 0), 9, 'd', (6,))
+        print('FI1: ', source_1)
+        print('FI2: ', source_2)
+
         # FORMAT_INFO_MASK = 0b101010000010010
         format_info = validate_format_info(source_1 ^ FORMAT_INFO_MASK, source_2 ^ FORMAT_INFO_MASK)
         print('format information: {:b}'.format(format_info))

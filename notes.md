@@ -5,4 +5,7 @@ http://web.archive.org/web/20140331040112/http://qrbcn.com/imatgesbloc/Three_QR_
 
 https://www.wikiwand.com/en/QR_code#/Decoding_example
 
+
+https://www.youtube.com/watch?time_continue=9&v=KA8hDldvfv0
+
 ISO 18004:2015
